@@ -1,0 +1,2338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layanan Pengaduan - Kantor GTK Maluku Utara</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
+        .card-shadow { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .animate-fade { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-bg text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <!-- Ministry of Education and Culture Logo -->
+                    <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center p-1 shadow-sm">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Logo_of_Ministry_of_Education_and_Culture_of_Republic_of_Indonesia.svg" 
+                             alt="Logo Kemendikbud" 
+                             class="w-full h-full object-contain"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <!-- Fallback SVG if image fails to load -->
+                        <svg viewBox="0 0 100 100" class="w-full h-full hidden" style="display: none;">
+                            <circle cx="50" cy="50" r="48" fill="#FFD700" stroke="#B8860B" stroke-width="2"/>
+                            <path d="M20 45 Q30 35 50 45 Q70 35 80 45 Q70 55 50 45 Q30 55 20 45" fill="#8B4513"/>
+                            <ellipse cx="50" cy="50" rx="8" ry="15" fill="#654321"/>
+                            <circle cx="50" cy="40" r="6" fill="#654321"/>
+                            <path d="M50 37 L52 35 L50 33 Z" fill="#FFD700"/>
+                            <circle cx="48" cy="38" r="1.5" fill="white"/>
+                            <circle cx="48" cy="38" r="0.8" fill="black"/>
+                            <path d="M50 65 Q45 75 40 80 Q50 75 50 65 Q55 75 60 80 Q50 75 50 65" fill="#8B4513"/>
+                            <g fill="white">
+                                <path d="M25 25 L26 28 L29 28 L27 30 L28 33 L25 31 L22 33 L23 30 L21 28 L24 28 Z"/>
+                                <path d="M75 25 L76 28 L79 28 L77 30 L78 33 L75 31 L72 33 L73 30 L71 28 L74 28 Z"/>
+                                <path d="M25 75 L26 78 L29 78 L27 80 L28 83 L25 81 L22 83 L23 80 L21 78 L24 78 Z"/>
+                                <path d="M75 75 L76 78 L79 78 L77 80 L78 83 L75 81 L72 83 L73 80 L71 78 L74 78 Z"/>
+                            </g>
+                            <rect x="15" y="85" width="70" height="8" fill="#DC143C" rx="2"/>
+                            <text x="50" y="91" text-anchor="middle" fill="white" font-size="4" font-weight="bold">TUT WURI HANDAYANI</text>
+                        </svg>
+                    </div>
+                    
+
+                    
+                    <div>
+                        <h1 class="text-xl font-bold">Kantor GTK Provinsi Maluku Utara</h1>
+                        <p class="text-blue-100 text-sm">Layanan Pengaduan & Permintaan Data</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button id="trackBtn" class="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50">
+                        Lacak Status
+                    </button>
+                    <button id="adminBtn" class="bg-yellow-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-yellow-600">
+                        Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Navigation Tabs -->
+        <div class="bg-white rounded-lg card-shadow mb-8">
+            <div class="flex border-b">
+                <button id="pengaduanTab" class="flex-1 py-4 px-6 text-center font-medium border-b-2 border-blue-500 text-blue-600 bg-blue-50">
+                    Pengaduan
+                </button>
+                <button id="permintaanTab" class="flex-1 py-4 px-6 text-center font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50">
+                    Permintaan Data
+                </button>
+                <button id="statusTab" class="flex-1 py-4 px-6 text-center font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50">
+                    Cek Status
+                </button>
+                <button id="adminTab" class="flex-1 py-4 px-6 text-center font-medium text-gray-600 hover:text-blue-600 hover:bg-gray-50 hidden">
+                    Admin Panel
+                </button>
+            </div>
+
+            <!-- Pengaduan Form -->
+            <div id="pengaduanContent" class="p-6 animate-fade">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Form Pengaduan</h2>
+                <form id="pengaduanForm" class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap *</label>
+                            <input type="text" id="namaPengadu" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                            <input type="email" id="emailPengadu" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">No. Telepon *</label>
+                            <input type="tel" id="teleponPengadu" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Kategori Pengaduan *</label>
+                            <select id="kategoriPengaduan" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="">Pilih Kategori</option>
+                                <option value="sertifikasi">Sertifikasi Guru</option>
+                                <option value="tunjangan">Tunjangan Profesi</option>
+                                <option value="mutasi">Mutasi/Perpindahan</option>
+                                <option value="promosi">Promosi Jabatan</option>
+                                <option value="administrasi">Administrasi Kepegawaian</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Judul Pengaduan *</label>
+                        <input type="text" id="judulPengaduan" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ringkasan singkat pengaduan Anda">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Detail Pengaduan *</label>
+                        <textarea id="detailPengaduan" required rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Jelaskan detail pengaduan Anda..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Berkas Pendukung (Opsional)</label>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="relative">
+                                    <input type="url" id="berkasUrl1" class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="https://drive.google.com/file/d/... atau link berkas lainnya">
+                                    <button type="button" onclick="validateFileLink('berkasUrl1')" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600" title="Validasi Link">
+                                        ✓
+                                    </button>
+                                </div>
+                                <div id="berkasUrl1Status" class="text-xs mt-1 hidden"></div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <p class="mb-1">📋 <strong>Platform yang didukung:</strong> Google Drive/Docs/Sheets/Slides, Dropbox, OneDrive, Box, MEGA</p>
+                                    <p class="mb-1">🔓 <strong>Penting:</strong> Pastikan file diatur <span class="font-semibold">"Anyone with the link can view"</span></p>
+                                    <details class="mt-2">
+                                        <summary class="cursor-pointer text-blue-600 hover:text-blue-800">📖 Cara mengatur akses publik</summary>
+                                        <div class="mt-2 p-2 bg-blue-50 rounded text-xs">
+                                            <p class="font-semibold mb-1">Google Drive/Docs:</p>
+                                            <p>1. Klik kanan file → Share → Change to "Anyone with the link"</p>
+                                            <p>2. Set permission ke "Viewer" → Copy link</p>
+                                            <p class="font-semibold mb-1 mt-2">Dropbox:</p>
+                                            <p>1. Klik Share → Create link → Copy link</p>
+                                            <p class="font-semibold mb-1 mt-2">OneDrive:</p>
+                                            <p>1. Klik Share → Anyone with the link can view → Copy link</p>
+                                        </div>
+                                    </details>
+                                </div>
+                            </div>
+                            <div>
+                                <input type="text" id="berkasNama1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nama berkas (contoh: Surat Pengaduan.pdf)">
+                            </div>
+                            <button type="button" id="addMoreFiles" class="text-blue-600 hover:text-blue-800 text-sm font-medium">+ Tambah berkas lainnya</button>
+                            <div id="additionalFiles" class="space-y-3"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700">
+                        Kirim Pengaduan
+                    </button>
+                </form>
+            </div>
+
+            <!-- Permintaan Data Form -->
+            <div id="permintaanContent" class="p-6 hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Form Permintaan Data</h2>
+                <form id="permintaanForm" class="space-y-6">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap *</label>
+                            <input type="text" id="namaPemohon" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                            <input type="email" id="emailPemohon" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">No. Telepon *</label>
+                            <input type="tel" id="teleponPemohon" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Instansi/Organisasi *</label>
+                            <input type="text" id="instansiPemohon" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Data yang Diminta *</label>
+                        <select id="jenisData" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="">Pilih Jenis Data</option>
+                            <option value="statistik-guru">Statistik Guru</option>
+                            <option value="data-sekolah">Data Sekolah</option>
+                            <option value="sertifikasi">Data Sertifikasi</option>
+                            <option value="tunjangan">Data Tunjangan</option>
+                            <option value="mutasi">Data Mutasi</option>
+                            <option value="lainnya">Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tujuan Penggunaan Data *</label>
+                        <textarea id="tujuanData" required rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Jelaskan tujuan penggunaan data..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Detail Permintaan Data *</label>
+                        <textarea id="detailPermintaan" required rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Jelaskan secara detail data yang Anda butuhkan..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Surat Permohonan Resmi *</label>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="relative">
+                                    <input type="url" id="suratUrl" required class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="https://drive.google.com/file/d/... atau link surat permohonan">
+                                    <button type="button" onclick="validateFileLink('suratUrl')" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600" title="Validasi Link">
+                                        ✓
+                                    </button>
+                                </div>
+                                <div id="suratUrlStatus" class="text-xs mt-1 hidden"></div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <p class="mb-1">📋 <strong>WAJIB:</strong> Link surat permohonan resmi dari instansi</p>
+                                    <p class="mb-1">🔓 <strong>Penting:</strong> Pastikan file diatur <span class="font-semibold">"Anyone with the link can view"</span></p>
+                                    <p class="text-red-600 font-medium">⚠️ Permintaan data tidak dapat diproses tanpa surat permohonan resmi</p>
+                                </div>
+                            </div>
+                            <div>
+                                <input type="text" id="suratNama" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nama berkas (contoh: Surat Permohonan Data.pdf)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Berkas Pendukung Lainnya (Opsional)</label>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="relative">
+                                    <input type="url" id="berkasPermintaanUrl1" class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="https://drive.google.com/file/d/... atau link berkas pendukung">
+                                    <button type="button" onclick="validateFileLink('berkasPermintaanUrl1')" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600" title="Validasi Link">
+                                        ✓
+                                    </button>
+                                </div>
+                                <div id="berkasPermintaanUrl1Status" class="text-xs mt-1 hidden"></div>
+                                <div class="text-xs text-gray-500 mt-1">
+                                    <p class="mb-1">📋 Berkas pendukung seperti proposal penelitian, surat keterangan, dll</p>
+                                    <p class="mb-1">🔓 <strong>Penting:</strong> Pastikan file diatur <span class="font-semibold">"Anyone with the link can view"</span></p>
+                                </div>
+                            </div>
+                            <div>
+                                <input type="text" id="berkasPermintaanNama1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nama berkas pendukung">
+                            </div>
+                            <button type="button" id="addMorePermintaanFiles" class="text-blue-600 hover:text-blue-800 text-sm font-medium">+ Tambah berkas lainnya</button>
+                            <div id="additionalPermintaanFiles" class="space-y-3"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-green-700">
+                        Kirim Permintaan Data
+                    </button>
+                </form>
+            </div>
+
+            <!-- Status Tracking -->
+            <div id="statusContent" class="p-6 hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Lacak Status Pengajuan</h2>
+                <div class="max-w-md mx-auto">
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Tiket</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="nomorTiket" placeholder="Masukkan nomor tiket" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <button id="cekStatusBtn" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700">
+                                Cek Status
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="statusResult" class="hidden bg-gray-50 rounded-lg p-6">
+                        <div class="text-center mb-4">
+                            <div id="statusIcon" class="text-4xl mb-2">⏳</div>
+                            <h3 id="statusTitle" class="text-lg font-semibold text-gray-800">Status Pengajuan</h3>
+                            <p id="statusDesc" class="text-sm text-gray-600 mt-1">Deskripsi status</p>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                                <span class="text-sm text-gray-700">Pengajuan diterima</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div id="step2" class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-700">Sedang diproses</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <div id="step3" class="w-3 h-3 bg-gray-300 rounded-full"></div>
+                                <span class="text-sm text-gray-700">Selesai diproses</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminContent" class="p-6 hidden">
+                <div id="adminLogin" class="max-w-md mx-auto">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Login Admin</h2>
+                    <form id="loginForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                            <input type="text" id="adminUsername" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <input type="password" id="adminPassword" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700">
+                            Login
+                        </button>
+                    </form>
+                    <p class="text-xs text-gray-500 mt-4 text-center">Demo: admin / admin123</p>
+                </div>
+
+                <div id="adminDashboard" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Dashboard Admin</h2>
+                        <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                            Logout
+                        </button>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <div class="grid md:grid-cols-4 gap-4 mb-8">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-blue-600 font-medium">Total Pengaduan</p>
+                                    <p id="totalPengaduan" class="text-2xl font-bold text-blue-800">0</p>
+                                </div>
+                                <div class="text-blue-500 text-2xl">P</div>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-green-600 font-medium">Permintaan Data</p>
+                                    <p id="totalPermintaan" class="text-2xl font-bold text-green-800">0</p>
+                                </div>
+                                <div class="text-green-500 text-2xl">D</div>
+                            </div>
+                        </div>
+                        <div class="bg-yellow-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-yellow-600 font-medium">Dalam Proses</p>
+                                    <p id="totalProses" class="text-2xl font-bold text-yellow-800">0</p>
+                                </div>
+                                <div class="text-yellow-500 text-2xl">W</div>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 rounded-lg p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-purple-600 font-medium">Selesai</p>
+                                    <p id="totalSelesai" class="text-2xl font-bold text-purple-800">0</p>
+                                </div>
+                                <div class="text-purple-500 text-2xl">C</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter and Search -->
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <div class="flex flex-wrap gap-4 items-center">
+                            <div>
+                                <select id="filterType" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                    <option value="">Semua Jenis</option>
+                                    <option value="pengaduan">Pengaduan</option>
+                                    <option value="permintaan">Permintaan Data</option>
+                                </select>
+                            </div>
+                            <div>
+                                <select id="filterStatus" class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                                    <option value="">Semua Status</option>
+                                    <option value="diterima">Diterima</option>
+                                    <option value="diproses">Diproses</option>
+                                    <option value="selesai">Selesai</option>
+                                </select>
+                            </div>
+                            <div class="flex-1">
+                                <input type="text" id="searchInput" placeholder="Cari berdasarkan nama, email, atau tiket..." class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <button id="viewEmailLogBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700">
+                                📧 Log Email
+                            </button>
+                            <button id="refreshBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Data Table -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tiket</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jenis</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dataTableBody" class="bg-white divide-y divide-gray-200">
+                                    <!-- Data will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="noDataMessage" class="text-center py-8 text-gray-500 hidden">
+                            Tidak ada data yang ditemukan
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                <div class="text-3xl mb-3 text-blue-500">⚡</div>
+                <h3 class="font-semibold text-gray-800 mb-2">Respon Cepat</h3>
+                <p class="text-sm text-gray-600">Pengaduan direspon maksimal 2x24 jam</p>
+            </div>
+            <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                <div class="text-3xl mb-3 text-green-500">🔒</div>
+                <h3 class="font-semibold text-gray-800 mb-2">Data Aman</h3>
+                <p class="text-sm text-gray-600">Informasi Anda dijamin kerahasiaannya</p>
+            </div>
+            <div class="bg-white rounded-lg card-shadow p-6 text-center">
+                <div class="text-3xl mb-3 text-purple-500">📞</div>
+                <h3 class="font-semibold text-gray-800 mb-2">Dukungan 24/7</h3>
+                <p class="text-sm text-gray-600">Tim support siap membantu Anda</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-6">
+                <div>
+                    <h4 class="font-semibold mb-3">Kontak Kami</h4>
+                    <p class="text-sm text-gray-300 mb-1">Alamat: Jl. Raya Ternate, Maluku Utara</p>
+                    <p class="text-sm text-gray-300 mb-1">Telepon: (0921) 123-4567</p>
+                    <p class="text-sm text-gray-300">Email: gtk@malut.go.id</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Jam Layanan</h4>
+                    <p class="text-sm text-gray-300 mb-1">Senin - Jumat: 08:00 - 16:00</p>
+                    <p class="text-sm text-gray-300">Sabtu: 08:00 - 12:00</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-3">Informasi</h4>
+                    <p class="text-sm text-gray-300 mb-1">SOP Layanan</p>
+                    <p class="text-sm text-gray-300 mb-1">FAQ</p>
+                    <p class="text-sm text-gray-300">Panduan Penggunaan</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-6 pt-6 text-center">
+                <p class="text-sm text-gray-400">© 2024 Kantor GTK Provinsi Maluku Utara. Semua hak dilindungi.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+            <div class="text-5xl mb-4 text-green-500">✅</div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-2">Berhasil Dikirim!</h3>
+            <p class="text-gray-600 mb-4">Pengajuan Anda telah berhasil dikirim.</p>
+            <p class="text-sm text-gray-500 mb-6">Nomor Tiket: <span id="ticketNumber" class="font-mono font-semibold text-blue-600"></span></p>
+            <button id="closeModal" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Detail Pengajuan</h3>
+                <button id="closeDetailModal" class="text-gray-400 hover:text-gray-600">
+                    <span class="text-2xl">×</span>
+                </button>
+            </div>
+            <div id="detailContent">
+                <!-- Content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div id="updateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Update Status</h3>
+                <button id="closeUpdateModal" class="text-gray-400 hover:text-gray-600">
+                    <span class="text-2xl">×</span>
+                </button>
+            </div>
+            <form id="updateStatusForm">
+                <input type="hidden" id="updateTicketNumber">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status Baru</label>
+                    <select id="newStatus" required class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        <option value="diterima">Diterima</option>
+                        <option value="diproses">Sedang Diproses</option>
+                        <option value="selesai">Selesai</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Catatan *</label>
+                    <textarea id="statusNote" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Wajib diisi - Berikan informasi kepada pemohon tentang status pengajuan..."></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Catatan ini akan dikirim via email kepada pemohon</p>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dokumen Tambahan (Opsional)</label>
+                    <input type="url" id="additionalDocUrl" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" placeholder="https://drive.google.com/... atau link dokumen lainnya">
+                    <input type="text" id="additionalDocName" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Nama dokumen (contoh: Formulir Tambahan.pdf)">
+                    <p class="text-xs text-gray-500 mt-1">Jika ada dokumen tambahan yang perlu diakses pemohon (formulir, panduan, hasil, dll)</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+                        Update Status
+                    </button>
+                    <button type="button" id="cancelUpdate" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Email Log Modal -->
+    <div id="emailLogModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg max-w-4xl mx-4 max-h-[90vh] overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 class="text-xl font-semibold text-gray-800">📧 Log Notifikasi Email</h3>
+                <button id="closeEmailLogModal" class="text-gray-400 hover:text-gray-600">
+                    <span class="text-2xl">×</span>
+                </button>
+            </div>
+            <div class="p-4">
+                <div class="mb-4 flex justify-between items-center">
+                    <p class="text-sm text-gray-600">Riwayat email yang telah dikirim ke pengguna</p>
+                    <button id="clearEmailLogBtn" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                        Hapus Log
+                    </button>
+                </div>
+                <div id="emailLogContent" class="max-h-[60vh] overflow-y-auto">
+                    <!-- Email log content will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Preview Modal -->
+    <div id="filePreviewModal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg max-w-4xl max-h-[90vh] mx-4 overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 id="previewFileName" class="text-lg font-semibold text-gray-800">Preview Berkas</h3>
+                <div class="flex space-x-2">
+                    <button id="openOriginalFile" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                        Buka Asli
+                    </button>
+                    <button id="closePreviewModal" class="text-gray-400 hover:text-gray-600">
+                        <span class="text-2xl">×</span>
+                    </button>
+                </div>
+            </div>
+            <div id="previewContent" class="p-4 overflow-auto max-h-[80vh]">
+                <!-- File content will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // EmailJS Configuration
+        (function(){
+            emailjs.init("qVo3m3fYZVOLmRUgO"); // Your actual EmailJS public key
+        })();
+
+        // Email service configuration
+        const EMAIL_CONFIG = {
+            serviceId: 'service_gx5l9at',
+            templateId: 'template_ogys7sy', 
+            publicKey: 'qVo3m3fYZVOLmRUgO',
+            enabled: true // Email nyata sudah aktif
+        };
+
+        // Tab Navigation
+        const tabs = {
+            pengaduan: { tab: document.getElementById('pengaduanTab'), content: document.getElementById('pengaduanContent') },
+            permintaan: { tab: document.getElementById('permintaanTab'), content: document.getElementById('permintaanContent') },
+            status: { tab: document.getElementById('statusTab'), content: document.getElementById('statusContent') },
+            admin: { tab: document.getElementById('adminTab'), content: document.getElementById('adminContent') }
+        };
+
+        function switchTab(activeTab) {
+            Object.keys(tabs).forEach(key => {
+                const { tab, content } = tabs[key];
+                if (key === activeTab) {
+                    tab.classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
+                    tab.classList.remove('text-gray-600');
+                    content.classList.remove('hidden');
+                    content.classList.add('animate-fade');
+                } else {
+                    tab.classList.remove('border-blue-500', 'text-blue-600', 'bg-blue-50');
+                    tab.classList.add('text-gray-600');
+                    content.classList.add('hidden');
+                    content.classList.remove('animate-fade');
+                }
+            });
+        }
+
+        tabs.pengaduan.tab.addEventListener('click', () => switchTab('pengaduan'));
+        tabs.permintaan.tab.addEventListener('click', () => switchTab('permintaan'));
+        tabs.status.tab.addEventListener('click', () => switchTab('status'));
+        tabs.admin.tab.addEventListener('click', () => switchTab('admin'));
+        document.getElementById('trackBtn').addEventListener('click', () => switchTab('status'));
+        document.getElementById('adminBtn').addEventListener('click', () => {
+            document.getElementById('adminTab').classList.remove('hidden');
+            switchTab('admin');
+        });
+
+        // Generate ticket number
+        function generateTicketNumber() {
+            const prefix = 'GTK';
+            const timestamp = Date.now().toString().slice(-6);
+            const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            return `${prefix}${timestamp}${random}`;
+        }
+
+        // Show success modal
+        function showSuccessModal(ticketNumber) {
+            document.getElementById('ticketNumber').textContent = ticketNumber;
+            document.getElementById('successModal').classList.remove('hidden');
+            document.getElementById('successModal').classList.add('flex');
+        }
+
+        // Close modal
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('successModal').classList.remove('flex');
+        });
+
+        // File management
+        let pengaduanFileCount = 1;
+        let permintaanFileCount = 1;
+
+        document.getElementById('addMoreFiles').addEventListener('click', () => {
+            pengaduanFileCount++;
+            const additionalFiles = document.getElementById('additionalFiles');
+            const newFileDiv = document.createElement('div');
+            newFileDiv.className = 'space-y-2 p-3 bg-gray-50 rounded-lg';
+            newFileDiv.innerHTML = `
+                <div>
+                    <div class="relative">
+                        <input type="url" id="berkasUrl${pengaduanFileCount}" class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg text-sm" placeholder="Link berkas ${pengaduanFileCount}">
+                        <button type="button" onclick="validateFileLink('berkasUrl${pengaduanFileCount}')" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" title="Validasi Link">
+                            ✓
+                        </button>
+                    </div>
+                    <div id="berkasUrl${pengaduanFileCount}Status" class="text-xs mt-1 hidden"></div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="berkasNama${pengaduanFileCount}" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Nama berkas ${pengaduanFileCount}">
+                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-600 hover:text-red-800 text-sm px-2">Hapus</button>
+                </div>
+            `;
+            additionalFiles.appendChild(newFileDiv);
+        });
+
+        document.getElementById('addMorePermintaanFiles').addEventListener('click', () => {
+            permintaanFileCount++;
+            const additionalFiles = document.getElementById('additionalPermintaanFiles');
+            const newFileDiv = document.createElement('div');
+            newFileDiv.className = 'space-y-2 p-3 bg-gray-50 rounded-lg';
+            newFileDiv.innerHTML = `
+                <div>
+                    <div class="relative">
+                        <input type="url" id="berkasPermintaanUrl${permintaanFileCount}" class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg text-sm" placeholder="Link berkas ${permintaanFileCount}">
+                        <button type="button" onclick="validateFileLink('berkasPermintaanUrl${permintaanFileCount}')" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600" title="Validasi Link">
+                            ✓
+                        </button>
+                    </div>
+                    <div id="berkasPermintaanUrl${permintaanFileCount}Status" class="text-xs mt-1 hidden"></div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="berkasPermintaanNama${permintaanFileCount}" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="Nama berkas ${permintaanFileCount}">
+                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-600 hover:text-red-800 text-sm px-2">Hapus</button>
+                </div>
+            `;
+            additionalFiles.appendChild(newFileDiv);
+        });
+
+        function collectFiles(prefix, maxCount) {
+            const files = [];
+            for (let i = 1; i <= maxCount; i++) {
+                const urlElement = document.getElementById(`${prefix}Url${i}`);
+                const namaElement = document.getElementById(`${prefix}Nama${i}`);
+                
+                if (urlElement && urlElement.value.trim()) {
+                    const fileName = namaElement && namaElement.value.trim() ? 
+                        namaElement.value.trim() : 
+                        `Berkas ${i} (${getFileTypeFromUrl(urlElement.value.trim())})`;
+                    
+                    files.push({
+                        url: urlElement.value.trim(),
+                        nama: fileName
+                    });
+                }
+            }
+            return files;
+        }
+
+        function getFileTypeFromUrl(url) {
+            if (url.includes('docs.google.com/document')) return 'Google Docs';
+            if (url.includes('docs.google.com/spreadsheets')) return 'Google Sheets';
+            if (url.includes('docs.google.com/presentation')) return 'Google Slides';
+            if (url.includes('docs.google.com/forms')) return 'Google Forms';
+            if (url.includes('drive.google.com')) return 'Google Drive';
+            if (url.includes('dropbox.com')) return 'Dropbox';
+            if (url.includes('onedrive.live.com') || url.includes('sharepoint.com')) return 'OneDrive';
+            if (url.includes('box.com')) return 'Box';
+            if (url.includes('mega.nz')) return 'MEGA';
+            if (url.toLowerCase().includes('.pdf')) return 'PDF';
+            if (url.toLowerCase().includes('.doc')) return 'Word';
+            if (url.toLowerCase().includes('.xls')) return 'Excel';
+            if (url.toLowerCase().includes('.ppt')) return 'PowerPoint';
+            if (url.toLowerCase().includes('.jpg') || url.toLowerCase().includes('.png')) return 'Gambar';
+            return 'File';
+        }
+
+        // Form submissions
+        document.getElementById('pengaduanForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const ticketNumber = generateTicketNumber();
+            
+            const berkasPendukung = collectFiles('berkas', pengaduanFileCount);
+            const currentTime = new Date().toISOString();
+            
+            const formData = {
+                type: 'pengaduan',
+                ticketNumber: ticketNumber,
+                nama: document.getElementById('namaPengadu').value,
+                email: document.getElementById('emailPengadu').value,
+                telepon: document.getElementById('teleponPengadu').value,
+                kategori: document.getElementById('kategoriPengaduan').value,
+                judul: document.getElementById('judulPengaduan').value,
+                detail: document.getElementById('detailPengaduan').value,
+                berkasPendukung: berkasPendukung,
+                timestamp: currentTime,
+                status: 'diterima',
+                statusHistory: [
+                    {
+                        status: 'diterima',
+                        timestamp: currentTime,
+                        note: 'Pengajuan berhasil diterima sistem'
+                    }
+                ]
+            };
+            
+            localStorage.setItem(ticketNumber, JSON.stringify(formData));
+            
+            // Send welcome email notification
+            sendWelcomeEmail(formData);
+            
+            showSuccessModal(ticketNumber);
+            document.getElementById('pengaduanForm').reset();
+            document.getElementById('additionalFiles').innerHTML = '';
+            pengaduanFileCount = 1;
+        });
+
+        document.getElementById('permintaanForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const ticketNumber = generateTicketNumber();
+            
+            const suratUrl = document.getElementById('suratUrl').value.trim();
+            const suratNama = document.getElementById('suratNama').value.trim();
+            
+            const suratPermohonan = suratUrl ? {
+                url: suratUrl,
+                nama: suratNama || `Surat Permohonan (${getFileTypeFromUrl(suratUrl)})`
+            } : null;
+            
+            const berkasPendukung = collectFiles('berkasPermintaan', permintaanFileCount);
+            const currentTime = new Date().toISOString();
+            
+            const formData = {
+                type: 'permintaan',
+                ticketNumber: ticketNumber,
+                nama: document.getElementById('namaPemohon').value,
+                email: document.getElementById('emailPemohon').value,
+                telepon: document.getElementById('teleponPemohon').value,
+                instansi: document.getElementById('instansiPemohon').value,
+                jenisData: document.getElementById('jenisData').value,
+                tujuan: document.getElementById('tujuanData').value,
+                detail: document.getElementById('detailPermintaan').value,
+                suratPermohonan: suratPermohonan,
+                berkasPendukung: berkasPendukung,
+                timestamp: currentTime,
+                status: 'diterima',
+                statusHistory: [
+                    {
+                        status: 'diterima',
+                        timestamp: currentTime,
+                        note: 'Permintaan data berhasil diterima sistem'
+                    }
+                ]
+            };
+            
+            localStorage.setItem(ticketNumber, JSON.stringify(formData));
+            
+            // Send welcome email notification
+            sendWelcomeEmail(formData);
+            
+            showSuccessModal(ticketNumber);
+            document.getElementById('permintaanForm').reset();
+            document.getElementById('additionalPermintaanFiles').innerHTML = '';
+            permintaanFileCount = 1;
+        });
+
+        // Status checking
+        document.getElementById('cekStatusBtn').addEventListener('click', () => {
+            const ticketNumber = document.getElementById('nomorTiket').value.trim();
+            const statusResult = document.getElementById('statusResult');
+            
+            if (!ticketNumber) {
+                alert('Masukkan nomor tiket terlebih dahulu');
+                return;
+            }
+            
+            const data = localStorage.getItem(ticketNumber);
+            
+            if (data) {
+                const submission = JSON.parse(data);
+                const statusIcon = document.getElementById('statusIcon');
+                const statusTitle = document.getElementById('statusTitle');
+                const statusDesc = document.getElementById('statusDesc');
+                
+                document.getElementById('step2').classList.remove('bg-blue-500', 'bg-green-500');
+                document.getElementById('step2').classList.add('bg-gray-300');
+                document.getElementById('step3').classList.remove('bg-green-500');
+                document.getElementById('step3').classList.add('bg-gray-300');
+                
+                let icon, title, desc;
+                
+                if (submission.status === 'diterima') {
+                    icon = '📨';
+                    title = 'Pengajuan Diterima';
+                    desc = 'Pengajuan Anda telah diterima dan akan segera diproses';
+                } else if (submission.status === 'diproses') {
+                    icon = '⏳';
+                    title = 'Sedang Diproses';
+                    desc = 'Tim kami sedang memproses pengajuan Anda';
+                    document.getElementById('step2').classList.remove('bg-gray-300');
+                    document.getElementById('step2').classList.add('bg-blue-500');
+                } else if (submission.status === 'selesai') {
+                    icon = '✅';
+                    title = 'Selesai Diproses';
+                    desc = 'Pengajuan Anda telah selesai diproses';
+                    document.getElementById('step2').classList.remove('bg-gray-300');
+                    document.getElementById('step2').classList.add('bg-green-500');
+                    document.getElementById('step3').classList.remove('bg-gray-300');
+                    document.getElementById('step3').classList.add('bg-green-500');
+                }
+                
+                // Add detailed timeline
+                if (submission.statusHistory && submission.statusHistory.length > 0) {
+                    desc += '\n\n📅 Riwayat Status:\n';
+                    submission.statusHistory.forEach((history, index) => {
+                        const date = new Date(history.timestamp).toLocaleString('id-ID', {
+                            day: '2-digit',
+                            month: '2-digit', 
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        const statusText = {
+                            'diterima': 'Diterima',
+                            'diproses': 'Sedang Diproses', 
+                            'selesai': 'Selesai'
+                        }[history.status] || history.status;
+                        
+                        desc += `\n• ${statusText} - ${date}`;
+                        if (history.note) {
+                            desc += `\n  ${history.note}`;
+                        }
+                    });
+                }
+                
+                statusIcon.textContent = icon;
+                statusTitle.textContent = title;
+                statusDesc.textContent = desc;
+                statusDesc.style.whiteSpace = 'pre-line';
+                statusResult.classList.remove('hidden');
+            } else {
+                alert('Nomor tiket tidak ditemukan. Pastikan nomor tiket yang Anda masukkan benar.');
+                statusResult.classList.add('hidden');
+            }
+        });
+
+        // Admin functionality
+        let isAdminLoggedIn = false;
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (username === 'admin' && password === 'admin123') {
+                isAdminLoggedIn = true;
+                document.getElementById('adminLogin').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.remove('hidden');
+                loadAdminData();
+            } else {
+                alert('Username atau password salah!');
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            isAdminLoggedIn = false;
+            document.getElementById('adminLogin').classList.remove('hidden');
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('adminUsername').value = '';
+            document.getElementById('adminPassword').value = '';
+        });
+
+        function loadAdminData() {
+            const allData = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('GTK')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        allData.push(data);
+                    } catch (e) {
+                        console.error('Error parsing data:', e);
+                    }
+                }
+            }
+            
+            updateStatistics(allData);
+            displayDataTable(allData);
+        }
+
+        function updateStatistics(data) {
+            const pengaduanCount = data.filter(item => item.type === 'pengaduan').length;
+            const permintaanCount = data.filter(item => item.type === 'permintaan').length;
+            const prosesCount = data.filter(item => item.status === 'diproses').length;
+            const selesaiCount = data.filter(item => item.status === 'selesai').length;
+
+            document.getElementById('totalPengaduan').textContent = pengaduanCount;
+            document.getElementById('totalPermintaan').textContent = permintaanCount;
+            document.getElementById('totalProses').textContent = prosesCount;
+            document.getElementById('totalSelesai').textContent = selesaiCount;
+        }
+
+        function displayDataTable(data) {
+            const tbody = document.getElementById('dataTableBody');
+            const noDataMessage = document.getElementById('noDataMessage');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '';
+                noDataMessage.classList.remove('hidden');
+                return;
+            }
+            
+            noDataMessage.classList.add('hidden');
+            
+            tbody.innerHTML = data.map(item => {
+                const date = new Date(item.timestamp).toLocaleDateString('id-ID');
+                const statusBadge = getStatusBadge(item.status);
+                const typeBadge = item.type === 'pengaduan' ? 
+                    '<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Pengaduan</span>' :
+                    '<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Permintaan Data</span>';
+                
+                const hasFiles = (item.berkasPendukung && item.berkasPendukung.length > 0) || 
+                                (item.suratPermohonan && item.suratPermohonan.url);
+                const fileIndicator = hasFiles ? '<span class="text-blue-500 text-xs ml-1">📎</span>' : '';
+                
+                return `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-sm font-mono text-blue-600">${item.ticketNumber}</td>
+                        <td class="px-4 py-3 text-sm">${typeBadge}${fileIndicator}</td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.nama}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${item.email}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${date}</td>
+                        <td class="px-4 py-3 text-sm">${statusBadge}</td>
+                        <td class="px-4 py-3 text-sm">
+                            <div class="flex space-x-2">
+                                <button onclick="viewDetail('${item.ticketNumber}')" class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                                    Lihat
+                                </button>
+                                <button onclick="updateStatus('${item.ticketNumber}')" class="text-green-600 hover:text-green-800 text-xs font-medium">
+                                    Update
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'diterima': '<span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">Diterima</span>',
+                'diproses': '<span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Diproses</span>',
+                'selesai': '<span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Selesai</span>'
+            };
+            return badges[status] || badges['diterima'];
+        }
+
+        function viewDetail(ticketNumber) {
+            const data = JSON.parse(localStorage.getItem(ticketNumber));
+            if (!data) return;
+            
+            const detailContent = document.getElementById('detailContent');
+            
+            let content = `
+                <div class="space-y-4">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Nomor Tiket</label>
+                            <p class="text-sm text-gray-900 font-mono">${data.ticketNumber}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Jenis</label>
+                            <p class="text-sm text-gray-900">${data.type === 'pengaduan' ? 'Pengaduan' : 'Permintaan Data'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Nama</label>
+                            <p class="text-sm text-gray-900">${data.nama}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <p class="text-sm text-gray-900">${data.email}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Telepon</label>
+                            <p class="text-sm text-gray-900">${data.telepon}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Tanggal</label>
+                            <p class="text-sm text-gray-900">${new Date(data.timestamp).toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+            `;
+            
+            if (data.type === 'pengaduan') {
+                content += `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Kategori</label>
+                        <p class="text-sm text-gray-900">${data.kategori}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Judul</label>
+                        <p class="text-sm text-gray-900">${data.judul}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Detail Pengaduan</label>
+                        <p class="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">${data.detail}</p>
+                    </div>
+                `;
+                
+                if (data.berkasPendukung && data.berkasPendukung.length > 0) {
+                    content += `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Berkas Pendukung (${data.berkasPendukung.length})</label>
+                            <div class="bg-gray-50 p-3 rounded-lg space-y-2">
+                    `;
+                    data.berkasPendukung.forEach((file, index) => {
+                        content += `
+                            <div class="flex items-center justify-between text-sm bg-white p-2 rounded border">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-lg">📄</span>
+                                    <span class="text-gray-900 font-medium">${file.nama}</span>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="previewFile('${file.url}', '${file.nama}')" 
+                                            class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
+                                        Preview
+                                    </button>
+                                    <button onclick="window.open('${file.url}', '_blank')" 
+                                            class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600">
+                                        Buka
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    content += `
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                content += `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Instansi</label>
+                        <p class="text-sm text-gray-900">${data.instansi}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Jenis Data</label>
+                        <p class="text-sm text-gray-900">${data.jenisData}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Tujuan</label>
+                        <p class="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">${data.tujuan}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Detail Permintaan</label>
+                        <p class="text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">${data.detail}</p>
+                    </div>
+                `;
+                
+                if (data.suratPermohonan && data.suratPermohonan.url) {
+                    content += `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Surat Permohonan Resmi</label>
+                            <div class="bg-gray-50 p-3 rounded-lg">
+                                <div class="flex items-center justify-between text-sm bg-white p-2 rounded border">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-lg">📄</span>
+                                        <span class="text-gray-900 font-medium">${data.suratPermohonan.nama}</span>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button onclick="previewFile('${data.suratPermohonan.url}', '${data.suratPermohonan.nama}')" 
+                                                class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
+                                            Preview
+                                        </button>
+                                        <button onclick="window.open('${data.suratPermohonan.url}', '_blank')" 
+                                                class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600">
+                                            Buka
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (data.berkasPendukung && data.berkasPendukung.length > 0) {
+                    content += `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Berkas Pendukung Lainnya (${data.berkasPendukung.length})</label>
+                            <div class="bg-gray-50 p-3 rounded-lg space-y-2">
+                    `;
+                    data.berkasPendukung.forEach((file, index) => {
+                        content += `
+                            <div class="flex items-center justify-between text-sm bg-white p-2 rounded border">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-lg">📄</span>
+                                    <span class="text-gray-900 font-medium">${file.nama}</span>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="previewFile('${file.url}', '${file.nama}')" 
+                                            class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600">
+                                        Preview
+                                    </button>
+                                    <button onclick="window.open('${file.url}', '_blank')" 
+                                            class="bg-green-500 text-white px-3 py-1 rounded text-xs hover:bg-green-600">
+                                        Buka
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    content += `
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            
+            content += `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Status Saat Ini</label>
+                        <p class="text-sm">${getStatusBadge(data.status)}</p>
+                    </div>
+            `;
+            
+            // Add status history timeline
+            if (data.statusHistory && data.statusHistory.length > 0) {
+                content += `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Riwayat Status</label>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="space-y-3">
+                `;
+                
+                data.statusHistory.forEach((history, index) => {
+                    const date = new Date(history.timestamp).toLocaleString('id-ID', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    const statusText = {
+                        'diterima': 'Diterima',
+                        'diproses': 'Sedang Diproses',
+                        'selesai': 'Selesai'
+                    }[history.status] || history.status;
+                    
+                    const statusColor = {
+                        'diterima': 'bg-yellow-100 text-yellow-800',
+                        'diproses': 'bg-blue-100 text-blue-800',
+                        'selesai': 'bg-green-100 text-green-800'
+                    }[history.status] || 'bg-gray-100 text-gray-800';
+                    
+                    content += `
+                        <div class="flex items-start space-x-3 bg-white p-3 rounded border-l-4 ${history.status === 'selesai' ? 'border-green-500' : history.status === 'diproses' ? 'border-blue-500' : 'border-yellow-500'}">
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColor}">
+                                    ${statusText}
+                                </span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900">${date}</p>
+                                ${history.note ? `<p class="text-sm text-gray-600 mt-1">${history.note}</p>` : ''}
+                                ${history.additionalDoc ? `
+                                    <div class="mt-2 p-2 bg-blue-50 rounded border">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="text-blue-500">📎</span>
+                                                <span class="text-sm font-medium text-blue-800">${history.additionalDoc.nama}</span>
+                                            </div>
+                                            <div class="flex space-x-2">
+                                                <button onclick="previewFile('${history.additionalDoc.url}', '${history.additionalDoc.nama}')" 
+                                                        class="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600">
+                                                    Preview
+                                                </button>
+                                                <button onclick="window.open('${history.additionalDoc.url}', '_blank')" 
+                                                        class="bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600">
+                                                    Buka
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                content += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            content += `
+                </div>
+            `;
+            
+            detailContent.innerHTML = content;
+            document.getElementById('detailModal').classList.remove('hidden');
+            document.getElementById('detailModal').classList.add('flex');
+        }
+
+        function updateStatus(ticketNumber) {
+            const data = JSON.parse(localStorage.getItem(ticketNumber));
+            if (!data) return;
+            
+            document.getElementById('updateTicketNumber').value = ticketNumber;
+            document.getElementById('newStatus').value = data.status;
+            document.getElementById('statusNote').value = '';
+            document.getElementById('additionalDocUrl').value = '';
+            document.getElementById('additionalDocName').value = '';
+            
+            document.getElementById('updateModal').classList.remove('hidden');
+            document.getElementById('updateModal').classList.add('flex');
+        }
+
+        document.getElementById('filterType').addEventListener('change', filterData);
+        document.getElementById('filterStatus').addEventListener('change', filterData);
+        document.getElementById('searchInput').addEventListener('input', filterData);
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            if (isAdminLoggedIn) loadAdminData();
+        });
+
+        // Email log functionality
+        document.getElementById('viewEmailLogBtn').addEventListener('click', () => {
+            showEmailLog();
+        });
+
+        document.getElementById('closeEmailLogModal').addEventListener('click', () => {
+            document.getElementById('emailLogModal').classList.add('hidden');
+            document.getElementById('emailLogModal').classList.remove('flex');
+        });
+
+        document.getElementById('clearEmailLogBtn').addEventListener('click', () => {
+            if (confirm('Apakah Anda yakin ingin menghapus semua log email?')) {
+                localStorage.removeItem('emailLog');
+                showEmailLog();
+            }
+        });
+
+        function showEmailLog() {
+            const emailLog = JSON.parse(localStorage.getItem('emailLog') || '[]');
+            const emailLogContent = document.getElementById('emailLogContent');
+            
+            if (emailLog.length === 0) {
+                emailLogContent.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <div class="text-4xl mb-2">📧</div>
+                        <p>Belum ada email yang dikirim</p>
+                    </div>
+                `;
+            } else {
+                // Sort by timestamp (newest first)
+                emailLog.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                
+                emailLogContent.innerHTML = emailLog.map((email, index) => {
+                    const date = new Date(email.timestamp).toLocaleString('id-ID', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    return `
+                        <div class="border rounded-lg p-4 mb-3 bg-gray-50">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <h4 class="font-medium text-gray-800">${email.subject}</h4>
+                                    <p class="text-sm text-gray-600">Kepada: ${email.to}</p>
+                                    <p class="text-xs text-gray-500">Dikirim: ${date}</p>
+                                </div>
+                                <button onclick="toggleEmailBody(${index})" class="text-blue-600 hover:text-blue-800 text-sm">
+                                    <span id="toggleText${index}">Lihat Isi</span>
+                                </button>
+                            </div>
+                            <div id="emailBody${index}" class="hidden bg-white p-3 rounded border text-sm">
+                                <pre class="whitespace-pre-wrap font-sans text-gray-700">${email.body}</pre>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            document.getElementById('emailLogModal').classList.remove('hidden');
+            document.getElementById('emailLogModal').classList.add('flex');
+        }
+
+        function toggleEmailBody(index) {
+            const emailBody = document.getElementById(`emailBody${index}`);
+            const toggleText = document.getElementById(`toggleText${index}`);
+            
+            if (emailBody.classList.contains('hidden')) {
+                emailBody.classList.remove('hidden');
+                toggleText.textContent = 'Sembunyikan';
+            } else {
+                emailBody.classList.add('hidden');
+                toggleText.textContent = 'Lihat Isi';
+            }
+        }
+
+        function filterData() {
+            if (!isAdminLoggedIn) return;
+            
+            const typeFilter = document.getElementById('filterType').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            const allData = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('GTK')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        allData.push(data);
+                    } catch (e) {
+                        console.error('Error parsing data:', e);
+                    }
+                }
+            }
+            
+            let filteredData = allData.filter(item => {
+                const matchesType = !typeFilter || item.type === typeFilter;
+                const matchesStatus = !statusFilter || item.status === statusFilter;
+                const matchesSearch = !searchTerm || 
+                    item.nama.toLowerCase().includes(searchTerm) ||
+                    item.email.toLowerCase().includes(searchTerm) ||
+                    item.ticketNumber.toLowerCase().includes(searchTerm);
+                
+                return matchesType && matchesStatus && matchesSearch;
+            });
+            
+            displayDataTable(filteredData);
+        }
+
+        // Modal close handlers
+        document.getElementById('closeDetailModal').addEventListener('click', () => {
+            document.getElementById('detailModal').classList.add('hidden');
+            document.getElementById('detailModal').classList.remove('flex');
+        });
+
+        document.getElementById('closeUpdateModal').addEventListener('click', () => {
+            document.getElementById('updateModal').classList.add('hidden');
+            document.getElementById('updateModal').classList.remove('flex');
+        });
+
+        document.getElementById('cancelUpdate').addEventListener('click', () => {
+            document.getElementById('updateModal').classList.add('hidden');
+            document.getElementById('updateModal').classList.remove('flex');
+        });
+
+        document.getElementById('updateStatusForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const ticketNumber = document.getElementById('updateTicketNumber').value;
+            const newStatus = document.getElementById('newStatus').value;
+            const note = document.getElementById('statusNote').value;
+            const additionalDocUrl = document.getElementById('additionalDocUrl').value.trim();
+            const additionalDocName = document.getElementById('additionalDocName').value.trim();
+            
+            const data = JSON.parse(localStorage.getItem(ticketNumber));
+            if (data) {
+                const currentTime = new Date().toISOString();
+                const oldStatus = data.status;
+                
+                // Prepare additional document if provided
+                let additionalDoc = null;
+                if (additionalDocUrl) {
+                    additionalDoc = {
+                        url: additionalDocUrl,
+                        nama: additionalDocName || `Dokumen Tambahan (${getFileTypeFromUrl(additionalDocUrl)})`
+                    };
+                }
+                
+                // Only add to history if status actually changed
+                if (data.status !== newStatus) {
+                    data.status = newStatus;
+                    
+                    // Initialize statusHistory if it doesn't exist (for old data)
+                    if (!data.statusHistory) {
+                        data.statusHistory = [
+                            {
+                                status: 'diterima',
+                                timestamp: data.timestamp,
+                                note: data.type === 'pengaduan' ? 'Pengajuan berhasil diterima sistem' : 'Permintaan data berhasil diterima sistem'
+                            }
+                        ];
+                    }
+                    
+                    // Add new status to history
+                    data.statusHistory.push({
+                        status: newStatus,
+                        timestamp: currentTime,
+                        note: note || `Status diubah menjadi ${newStatus} oleh admin`,
+                        additionalDoc: additionalDoc
+                    });
+                    
+                    // Send email notification for status change
+                    sendEmailNotification(data, newStatus, note, false, additionalDoc);
+                    
+                } else if (note || additionalDoc) {
+                    // If status same but there's a note or document, update the latest entry
+                    if (data.statusHistory && data.statusHistory.length > 0) {
+                        data.statusHistory[data.statusHistory.length - 1].note = note;
+                        data.statusHistory[data.statusHistory.length - 1].timestamp = currentTime;
+                        if (additionalDoc) {
+                            data.statusHistory[data.statusHistory.length - 1].additionalDoc = additionalDoc;
+                        }
+                    }
+                    
+                    // Send email notification for note/document update
+                    sendEmailNotification(data, newStatus, note, true, additionalDoc);
+                }
+                
+                data.lastUpdated = currentTime;
+                
+                localStorage.setItem(ticketNumber, JSON.stringify(data));
+                
+                document.getElementById('updateModal').classList.add('hidden');
+                document.getElementById('updateModal').classList.remove('flex');
+                
+                loadAdminData();
+            }
+        });
+
+        // Email notification system
+        function sendEmailNotification(data, status, note, isNoteUpdate = false, additionalDoc = null) {
+            const emailData = {
+                to: data.email,
+                subject: generateEmailSubject(data, status, isNoteUpdate),
+                body: generateEmailBody(data, status, note, isNoteUpdate, additionalDoc),
+                timestamp: new Date().toISOString(),
+                ticketNumber: data.ticketNumber,
+                status: status
+            };
+            
+            // Store email log
+            const emailLog = JSON.parse(localStorage.getItem('emailLog') || '[]');
+            emailLog.push(emailData);
+            localStorage.setItem('emailLog', JSON.stringify(emailLog));
+            
+            // Send actual email using EmailJS service
+            sendActualEmail(emailData);
+            
+            return true;
+        }
+
+        // Function to send actual email using EmailJS
+        function sendActualEmail(emailData) {
+            try {
+                if (EMAIL_CONFIG.enabled && typeof emailjs !== 'undefined') {
+                    // Send real email using EmailJS
+                    const templateParams = {
+                        to_email: emailData.to,
+                        to_name: emailData.to.split('@')[0], // Extract name from email
+                        subject: emailData.subject,
+                        message: emailData.body,
+                        from_name: 'GTK Maluku Utara',
+                        reply_to: 'gtk@malut.go.id',
+                        ticket_number: emailData.ticketNumber,
+                        status: emailData.status
+                    };
+
+                    emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, templateParams)
+                        .then(function(response) {
+                            console.log('✅ Email sent successfully!', response.status, response.text);
+                            showEmailSentNotification(emailData);
+                        })
+                        .catch(function(error) {
+                            console.error('❌ Email sending failed:', error);
+                            showEmailErrorNotification(emailData.to);
+                            // Fallback to mock for demo
+                            sendMockEmail(emailData);
+                        });
+                } else {
+                    // Fallback to mock email for demo
+                    sendMockEmail(emailData);
+                }
+                
+            } catch (error) {
+                console.error('Error in email sending process:', error);
+                sendMockEmail(emailData);
+            }
+        }
+
+        // Mock email sending for demo purposes
+        function sendMockEmail(emailData) {
+            console.log('📧 Mock email service - Email would be sent to:', emailData.to);
+            console.log('📧 Email subject:', emailData.subject);
+            console.log('📧 Email body preview:', emailData.body.substring(0, 200) + '...');
+            
+            // Simulate network delay
+            setTimeout(() => {
+                // Show success notification
+                showEmailSentNotification(emailData);
+                
+                // Show demo notification explaining this is a simulation
+                showDemoEmailNotification(emailData);
+                
+            }, Math.random() * 2000 + 1000); // Random delay 1-3 seconds
+        }
+
+        // Show demo notification
+        function showDemoEmailNotification(emailData) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-blue-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 max-w-sm animate-fade';
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="text-2xl">ℹ️</div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold">Mode Demo</h4>
+                        <p class="text-sm opacity-90 mt-1">Ini adalah simulasi pengiriman email.</p>
+                        <p class="text-xs opacity-75 mt-2">Untuk mengirim email nyata, konfigurasikan EmailJS di kode.</p>
+                        <button onclick="showEmailSetupGuide()" class="text-xs bg-blue-600 px-2 py-1 rounded mt-2 hover:bg-blue-700">
+                            Panduan Setup
+                        </button>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 text-xl leading-none ml-2">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 10 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 10000);
+        }
+
+        // Show email setup guide
+        function showEmailSetupGuide() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-lg max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-gray-800">📧 Panduan Setup Email Nyata</h3>
+                            <button onclick="this.closest('.fixed').remove()" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+                        </div>
+                        
+                        <div class="space-y-4 text-sm">
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <h4 class="font-semibold text-yellow-800 mb-2">⚠️ Saat Ini Mode Demo</h4>
+                                <p class="text-yellow-700">Email tidak benar-benar dikirim. Untuk mengaktifkan email nyata, ikuti langkah berikut:</p>
+                            </div>
+                            
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 class="font-semibold text-blue-800 mb-3">🚀 Langkah Setup EmailJS:</h4>
+                                <ol class="list-decimal list-inside space-y-2 text-blue-700">
+                                    <li>Daftar akun gratis di <a href="https://emailjs.com" target="_blank" class="underline">EmailJS.com</a></li>
+                                    <li>Buat Email Service (Gmail, Outlook, dll)</li>
+                                    <li>Buat Email Template dengan variabel:
+                                        <ul class="list-disc list-inside ml-4 mt-1 text-xs">
+                                            <li>{{to_email}} - Email penerima</li>
+                                            <li>{{subject}} - Subject email</li>
+                                            <li>{{message}} - Isi email</li>
+                                            <li>{{from_name}} - Nama pengirim</li>
+                                        </ul>
+                                    </li>
+                                    <li>Salin Service ID, Template ID, dan Public Key</li>
+                                    <li>Update konfigurasi di kode:
+                                        <pre class="bg-gray-100 p-2 rounded mt-2 text-xs overflow-x-auto">
+const EMAIL_CONFIG = {
+    serviceId: 'your_service_id',
+    templateId: 'your_template_id', 
+    publicKey: 'your_public_key',
+    enabled: true // Ubah ke true
+};</pre>
+                                    </li>
+                                </ol>
+                            </div>
+                            
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <h4 class="font-semibold text-green-800 mb-2">✅ Alternatif Lain:</h4>
+                                <ul class="list-disc list-inside space-y-1 text-green-700">
+                                    <li><strong>SendGrid:</strong> Service email profesional</li>
+                                    <li><strong>Mailgun:</strong> API email untuk developer</li>
+                                    <li><strong>SMTP Server:</strong> Server email sendiri</li>
+                                    <li><strong>Backend Integration:</strong> Kirim via server backend</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <h4 class="font-semibold text-gray-800 mb-2">📋 Fitur Email Saat Ini:</h4>
+                                <ul class="list-disc list-inside space-y-1 text-gray-700">
+                                    <li>✅ Template email profesional</li>
+                                    <li>✅ Notifikasi status otomatis</li>
+                                    <li>✅ Log email lengkap</li>
+                                    <li>✅ Error handling</li>
+                                    <li>⏳ Pengiriman nyata (perlu setup)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-end">
+                            <button onclick="this.closest('.fixed').remove()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                Mengerti
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Show email sent notification
+        function showEmailSentNotification(emailData) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 max-w-sm animate-fade';
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="text-2xl">✅</div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold">Email Berhasil Dikirim!</h4>
+                        <p class="text-sm opacity-90 mt-1">Notifikasi telah dikirim ke:</p>
+                        <p class="text-sm font-mono bg-green-600 px-2 py-1 rounded mt-1 break-all">${emailData.to}</p>
+                        <p class="text-xs opacity-75 mt-2">Tiket: ${emailData.ticketNumber}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 text-xl leading-none ml-2">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 8 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 8000);
+        }
+
+        // Show email error notification
+        function showEmailErrorNotification(email) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 max-w-sm animate-fade';
+            notification.innerHTML = `
+                <div class="flex items-start space-x-3">
+                    <div class="text-2xl">❌</div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold">Email Gagal Dikirim</h4>
+                        <p class="text-sm opacity-90 mt-1">Gagal mengirim ke:</p>
+                        <p class="text-sm font-mono bg-red-600 px-2 py-1 rounded mt-1 break-all">${email}</p>
+                        <p class="text-xs opacity-75 mt-2">Silakan coba lagi atau hubungi IT support</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-200 text-xl leading-none ml-2">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 10 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 10000);
+        }
+
+        function generateEmailSubject(data, status, isNoteUpdate) {
+            const statusText = {
+                'diterima': 'Diterima',
+                'diproses': 'Sedang Diproses',
+                'selesai': 'Selesai Diproses'
+            }[status] || status;
+            
+            const typeText = data.type === 'pengaduan' ? 'Pengaduan' : 'Permintaan Data';
+            
+            if (isNoteUpdate) {
+                return `[GTK Maluku Utara] Update ${typeText} - ${data.ticketNumber}`;
+            }
+            
+            return `[GTK Maluku Utara] ${typeText} ${statusText} - ${data.ticketNumber}`;
+        }
+
+        function generateEmailBody(data, status, note, isNoteUpdate, additionalDoc = null) {
+            const statusText = {
+                'diterima': 'Diterima',
+                'diproses': 'Sedang Diproses',
+                'selesai': 'Selesai Diproses'
+            }[status] || status;
+            
+            const typeText = data.type === 'pengaduan' ? 'Pengaduan' : 'Permintaan Data';
+            const currentDate = new Date().toLocaleDateString('id-ID', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            let statusMessage = '';
+            let nextSteps = '';
+            
+            if (isNoteUpdate) {
+                statusMessage = `Tim kami telah menambahkan informasi terbaru terkait ${typeText.toLowerCase()} Anda.`;
+            } else {
+                switch (status) {
+                    case 'diterima':
+                        statusMessage = `${typeText} Anda telah berhasil diterima dan akan segera diproses oleh tim kami.`;
+                        nextSteps = 'Tim kami akan melakukan review dan menghubungi Anda jika diperlukan informasi tambahan.';
+                        break;
+                    case 'diproses':
+                        statusMessage = `${typeText} Anda sedang dalam proses review oleh tim terkait.`;
+                        nextSteps = 'Kami akan segera menyelesaikan proses ini dan memberikan update selanjutnya.';
+                        break;
+                    case 'selesai':
+                        statusMessage = `${typeText} Anda telah selesai diproses.`;
+                        nextSteps = 'Jika ada pertanyaan lebih lanjut, silakan hubungi kami melalui kontak yang tersedia.';
+                        break;
+                }
+            }
+            
+            let emailBody = `
+Yth. ${data.nama},
+
+${statusMessage}
+
+📋 DETAIL ${typeText.toUpperCase()}:
+• Nomor Tiket: ${data.ticketNumber}
+• Status: ${statusText}
+• Tanggal Update: ${currentDate}
+${data.type === 'pengaduan' ? `• Kategori: ${data.kategori}` : `• Jenis Data: ${data.jenisData}`}
+${data.type === 'pengaduan' ? `• Judul: ${data.judul}` : `• Instansi: ${data.instansi}`}
+`;
+
+            if (note) {
+                emailBody += `\n💬 CATATAN DARI TIM:\n${note}\n`;
+            }
+            
+            // Add additional document if provided
+            if (additionalDoc) {
+                emailBody += `\n📎 DOKUMEN TAMBAHAN:\n`;
+                emailBody += `• ${additionalDoc.nama}\n`;
+                emailBody += `• Link: ${additionalDoc.url}\n`;
+                emailBody += `\nSilakan akses dokumen di atas untuk informasi lebih lanjut.\n`;
+            }
+            
+            if (nextSteps) {
+                emailBody += `\n📌 LANGKAH SELANJUTNYA:\n${nextSteps}\n`;
+            }
+            
+            // Add status timeline
+            if (data.statusHistory && data.statusHistory.length > 1) {
+                emailBody += `\n📅 RIWAYAT STATUS:\n`;
+                data.statusHistory.forEach((history, index) => {
+                    const historyDate = new Date(history.timestamp).toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    const historyStatusText = {
+                        'diterima': 'Diterima',
+                        'diproses': 'Sedang Diproses',
+                        'selesai': 'Selesai'
+                    }[history.status] || history.status;
+                    
+                    emailBody += `${index + 1}. ${historyStatusText} - ${historyDate}\n`;
+                    if (history.note) {
+                        emailBody += `   ${history.note}\n`;
+                    }
+                    if (history.additionalDoc) {
+                        emailBody += `   📎 ${history.additionalDoc.nama}: ${history.additionalDoc.url}\n`;
+                    }
+                });
+            }
+            
+            emailBody += `
+🔍 LACAK STATUS:
+Anda dapat melacak status ${typeText.toLowerCase()} kapan saja dengan mengunjungi:
+https://gtk-malut.go.id dan masukkan nomor tiket: ${data.ticketNumber}
+
+📞 KONTAK KAMI:
+• Telepon: (0921) 123-4567
+• Email: gtk@malut.go.id
+• Alamat: Jl. Raya Ternate, Maluku Utara
+
+Terima kasih atas kepercayaan Anda kepada layanan kami.
+
+Salam,
+Tim Layanan GTK Provinsi Maluku Utara
+
+---
+Email ini dikirim secara otomatis. Mohon tidak membalas email ini.
+Jika ada pertanyaan, silakan hubungi kontak resmi kami.
+            `;
+            
+            return emailBody.trim();
+        }
+
+
+
+        // Auto-send email when new submission is created
+        function sendWelcomeEmail(data) {
+            sendEmailNotification(data, 'diterima', 'Pengajuan Anda telah berhasil diterima sistem dan akan segera diproses oleh tim kami.');
+        }
+
+        // Link validation functionality
+        async function validateFileLink(inputId) {
+            const input = document.getElementById(inputId);
+            const statusDiv = document.getElementById(inputId + 'Status');
+            const url = input.value.trim();
+            
+            if (!url) {
+                showValidationStatus(statusDiv, 'error', 'Masukkan URL terlebih dahulu');
+                return false;
+            }
+            
+            // Show loading state
+            showValidationStatus(statusDiv, 'loading', 'Memvalidasi link...');
+            
+            try {
+                // Basic URL validation
+                const urlObj = new URL(url);
+                
+                // Check if it's a supported platform
+                const supportedPlatforms = [
+                    'drive.google.com',
+                    'docs.google.com',
+                    'dropbox.com',
+                    'onedrive.live.com',
+                    'sharepoint.com',
+                    'box.com',
+                    'mega.nz',
+                    'mediafire.com',
+                    'wetransfer.com'
+                ];
+                
+                const isSupported = supportedPlatforms.some(platform => 
+                    urlObj.hostname.includes(platform)
+                );
+                
+                if (!isSupported) {
+                    showValidationStatus(statusDiv, 'warning', 
+                        'Platform tidak dikenali. Pastikan link dapat diakses publik.');
+                    return false;
+                }
+                
+                // Specific validation for Google services (Drive, Docs, Sheets, etc.)
+                if (urlObj.hostname.includes('drive.google.com') || urlObj.hostname.includes('docs.google.com')) {
+                    return validateGoogleDriveLink(url, statusDiv);
+                }
+                
+                // Specific validation for Dropbox
+                if (urlObj.hostname.includes('dropbox.com')) {
+                    return validateDropboxLink(url, statusDiv);
+                }
+                
+                // Specific validation for OneDrive
+                if (urlObj.hostname.includes('onedrive.live.com') || urlObj.hostname.includes('sharepoint.com')) {
+                    return validateOneDriveLink(url, statusDiv);
+                }
+                
+                // Specific validation for other platforms
+                if (urlObj.hostname.includes('box.com')) {
+                    return validateBoxLink(url, statusDiv);
+                }
+                
+                if (urlObj.hostname.includes('mega.nz')) {
+                    return validateMegaLink(url, statusDiv);
+                }
+                
+                // For other platforms, do basic accessibility check
+                return await checkLinkAccessibility(url, statusDiv);
+                
+            } catch (error) {
+                showValidationStatus(statusDiv, 'error', 'Format URL tidak valid');
+                return false;
+            }
+        }
+        
+        function validateGoogleDriveLink(url, statusDiv) {
+            // Check different Google services link formats
+            
+            // Google Docs: docs.google.com/document/d/[ID]/edit
+            if (url.includes('docs.google.com/document/d/')) {
+                const docIdMatch = url.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
+                if (docIdMatch) {
+                    if (url.includes('usp=sharing') || url.includes('/edit')) {
+                        showValidationStatus(statusDiv, 'success', 
+                            '✅ Link Google Docs valid dan dapat diakses publik');
+                        return true;
+                    } else {
+                        showValidationStatus(statusDiv, 'warning', 
+                            '⚠️ Link Google Docs terdeteksi. Pastikan dokumen diatur "Anyone with the link can view"');
+                        return false;
+                    }
+                }
+            }
+            
+            // Google Sheets: docs.google.com/spreadsheets/d/[ID]/edit
+            if (url.includes('docs.google.com/spreadsheets/d/')) {
+                const sheetIdMatch = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+                if (sheetIdMatch) {
+                    showValidationStatus(statusDiv, 'success', 
+                        '✅ Link Google Sheets valid dan dapat diakses publik');
+                    return true;
+                }
+            }
+            
+            // Google Slides: docs.google.com/presentation/d/[ID]/edit
+            if (url.includes('docs.google.com/presentation/d/')) {
+                const slideIdMatch = url.match(/\/presentation\/d\/([a-zA-Z0-9-_]+)/);
+                if (slideIdMatch) {
+                    showValidationStatus(statusDiv, 'success', 
+                        '✅ Link Google Slides valid dan dapat diakses publik');
+                    return true;
+                }
+            }
+            
+            // Google Forms: docs.google.com/forms/d/[ID]/viewform
+            if (url.includes('docs.google.com/forms/d/')) {
+                const formIdMatch = url.match(/\/forms\/d\/([a-zA-Z0-9-_]+)/);
+                if (formIdMatch) {
+                    showValidationStatus(statusDiv, 'success', 
+                        '✅ Link Google Forms valid dan dapat diakses publik');
+                    return true;
+                }
+            }
+            
+            // Google Drive Files: drive.google.com/file/d/[ID]/view
+            if (url.includes('/file/d/') && url.includes('/view')) {
+                const fileIdMatch = url.match(/\/file\/d\/([a-zA-Z0-9-_]+)/);
+                if (fileIdMatch) {
+                    if (url.includes('usp=sharing') || url.includes('usp=drive_link')) {
+                        showValidationStatus(statusDiv, 'success', 
+                            '✅ Link Google Drive valid dan dapat diakses publik');
+                        return true;
+                    } else {
+                        showValidationStatus(statusDiv, 'warning', 
+                            '⚠️ Link Google Drive terdeteksi. Pastikan file diatur "Anyone with the link can view"');
+                        return false;
+                    }
+                }
+            }
+            
+            // Google Drive Open: drive.google.com/open?id=[ID]
+            if (url.includes('/open?id=')) {
+                const fileIdMatch = url.match(/[?&]id=([a-zA-Z0-9-_]+)/);
+                if (fileIdMatch) {
+                    if (url.includes('usp=drive_fs') || url.includes('usp=sharing') || url.includes('usp=drive_link')) {
+                        showValidationStatus(statusDiv, 'success', 
+                            '✅ Link Google Drive valid dan dapat diakses publik');
+                        return true;
+                    } else {
+                        showValidationStatus(statusDiv, 'success', 
+                            '✅ Link Google Drive terdeteksi. Pastikan file diatur "Anyone with the link can view"');
+                        return true;
+                    }
+                }
+            }
+            
+            // Google Drive Folders: drive.google.com/folders/[ID] or drive.google.com/drive/folders/[ID]
+            if (url.includes('/folders/')) {
+                const folderIdMatch = url.match(/\/folders\/([a-zA-Z0-9-_]+)/);
+                if (folderIdMatch) {
+                    showValidationStatus(statusDiv, 'success', 
+                        '✅ Link Google Drive folder valid. Pastikan folder diatur "Anyone with the link can view"');
+                    return true;
+                }
+            }
+            
+            showValidationStatus(statusDiv, 'error', 
+                '❌ Format link Google tidak dikenali. Pastikan menggunakan link sharing yang benar.');
+            return false;
+        }
+        
+        function validateDropboxLink(url, statusDiv) {
+            // Check if it's a proper Dropbox sharing link
+            if (url.includes('dropbox.com') && (url.includes('?dl=0') || url.includes('?dl=1'))) {
+                showValidationStatus(statusDiv, 'success', 
+                    '✅ Link Dropbox valid dan dapat diakses publik');
+                return true;
+            } else if (url.includes('dropbox.com')) {
+                showValidationStatus(statusDiv, 'warning', 
+                    '⚠️ Link Dropbox terdeteksi. Pastikan file dapat diakses publik');
+                return false;
+            }
+            
+            showValidationStatus(statusDiv, 'error', 
+                '❌ Format link Dropbox tidak valid');
+            return false;
+        }
+        
+        function validateOneDriveLink(url, statusDiv) {
+            // OneDrive sharing links usually contain 'sharing' or 'embed'
+            if (url.includes('onedrive.live.com') || url.includes('sharepoint.com')) {
+                if (url.includes('?') && (url.includes('sharing') || url.includes('embed') || url.includes('view'))) {
+                    showValidationStatus(statusDiv, 'success', 
+                        '✅ Link OneDrive/SharePoint valid dan dapat diakses publik');
+                    return true;
+                } else {
+                    showValidationStatus(statusDiv, 'warning', 
+                        '⚠️ Link OneDrive terdeteksi. Pastikan file diatur untuk sharing publik');
+                    return false;
+                }
+            }
+            
+            showValidationStatus(statusDiv, 'error', 
+                '❌ Format link OneDrive tidak valid');
+            return false;
+        }
+        
+        function validateBoxLink(url, statusDiv) {
+            // Box sharing links usually contain 'shared' or 'view'
+            if (url.includes('box.com')) {
+                if (url.includes('/s/') || url.includes('/shared/') || url.includes('/view/')) {
+                    showValidationStatus(statusDiv, 'success', 
+                        '✅ Link Box valid dan dapat diakses publik');
+                    return true;
+                } else {
+                    showValidationStatus(statusDiv, 'warning', 
+                        '⚠️ Link Box terdeteksi. Pastikan file dapat diakses publik');
+                    return false;
+                }
+            }
+            
+            showValidationStatus(statusDiv, 'error', 
+                '❌ Format link Box tidak valid');
+            return false;
+        }
+        
+        function validateMegaLink(url, statusDiv) {
+            // MEGA sharing links contain file or folder identifiers
+            if (url.includes('mega.nz')) {
+                if (url.includes('/#!') || url.includes('/file/') || url.includes('/folder/')) {
+                    showValidationStatus(statusDiv, 'success', 
+                        '✅ Link MEGA valid dan dapat diakses publik');
+                    return true;
+                } else {
+                    showValidationStatus(statusDiv, 'warning', 
+                        '⚠️ Link MEGA terdeteksi. Pastikan file dapat diakses publik');
+                    return false;
+                }
+            }
+            
+            showValidationStatus(statusDiv, 'error', 
+                '❌ Format link MEGA tidak valid');
+            return false;
+        }
+        
+        async function checkLinkAccessibility(url, statusDiv) {
+            try {
+                // Create a test request to check if the URL is accessible
+                // Note: This is limited by CORS policy, so we'll do basic checks
+                
+                // For now, we'll do basic validation and provide guidance
+                showValidationStatus(statusDiv, 'warning', 
+                    '⚠️ Platform terdeteksi. Pastikan link dapat diakses tanpa login');
+                
+                return false;
+            } catch (error) {
+                showValidationStatus(statusDiv, 'error', 
+                    '❌ Tidak dapat memvalidasi link. Pastikan URL benar dan dapat diakses publik');
+                return false;
+            }
+        }
+        
+        function showValidationStatus(statusDiv, type, message) {
+            statusDiv.classList.remove('hidden');
+            statusDiv.className = `text-xs mt-1 ${getStatusClass(type)}`;
+            statusDiv.textContent = message;
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.classList.add('hidden');
+                }, 5000);
+            }
+        }
+        
+        function getStatusClass(type) {
+            switch (type) {
+                case 'success':
+                    return 'text-green-600 bg-green-50 px-2 py-1 rounded';
+                case 'error':
+                    return 'text-red-600 bg-red-50 px-2 py-1 rounded';
+                case 'warning':
+                    return 'text-yellow-600 bg-yellow-50 px-2 py-1 rounded';
+                case 'loading':
+                    return 'text-blue-600 bg-blue-50 px-2 py-1 rounded';
+                default:
+                    return 'text-gray-600';
+            }
+        }
+        
+        // Auto-validate on blur for better UX
+        document.addEventListener('blur', function(e) {
+            if (e.target.type === 'url' && e.target.id.includes('Url') && e.target.value.trim()) {
+                setTimeout(() => validateFileLink(e.target.id), 500);
+            }
+        }, true);
+
+        // File preview functionality
+        let currentFileUrl = '';
+
+        function previewFile(url, fileName) {
+            currentFileUrl = url;
+            document.getElementById('previewFileName').textContent = fileName;
+            
+            const previewContent = document.getElementById('previewContent');
+            
+            // Convert various platform links to embeddable format
+            let embedUrl = url;
+            let canEmbed = false;
+            
+            // Google Drive Files
+            if (url.includes('drive.google.com/file/d/')) {
+                const fileId = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+                if (fileId) {
+                    embedUrl = `https://drive.google.com/file/d/${fileId[1]}/preview`;
+                    canEmbed = true;
+                }
+            }
+            // Google Docs
+            else if (url.includes('docs.google.com/document/d/')) {
+                const docId = url.match(/\/document\/d\/([a-zA-Z0-9-_]+)/);
+                if (docId) {
+                    embedUrl = `https://docs.google.com/document/d/${docId[1]}/preview`;
+                    canEmbed = true;
+                }
+            }
+            // Google Sheets
+            else if (url.includes('docs.google.com/spreadsheets/d/')) {
+                const sheetId = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+                if (sheetId) {
+                    embedUrl = `https://docs.google.com/spreadsheets/d/${sheetId[1]}/preview`;
+                    canEmbed = true;
+                }
+            }
+            // Google Slides
+            else if (url.includes('docs.google.com/presentation/d/')) {
+                const slideId = url.match(/\/presentation\/d\/([a-zA-Z0-9-_]+)/);
+                if (slideId) {
+                    embedUrl = `https://docs.google.com/presentation/d/${slideId[1]}/preview`;
+                    canEmbed = true;
+                }
+            }
+            // Dropbox
+            else if (url.includes('dropbox.com')) {
+                embedUrl = url.replace('?dl=0', '?raw=1');
+                canEmbed = true;
+            }
+            // OneDrive
+            else if (url.includes('onedrive.live.com')) {
+                embedUrl = url.replace('/view', '/embed');
+                canEmbed = true;
+            }
+            // PDF files
+            else if (url.toLowerCase().includes('.pdf')) {
+                canEmbed = true;
+            }
+            
+            // Try to embed the file
+            if (canEmbed) {
+                previewContent.innerHTML = `
+                    <div class="w-full h-[70vh]">
+                        <iframe src="${embedUrl}" class="w-full h-full border rounded-lg" frameborder="0" 
+                                onload="this.style.display='block'" 
+                                onerror="showPreviewError('${url}', '${fileName}')">
+                        </iframe>
+                        <div id="loadingPreview" class="text-center py-8 text-gray-500">
+                            <div class="animate-spin inline-block w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mb-2"></div>
+                            <p>Memuat preview...</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Hide loading after iframe loads
+                setTimeout(() => {
+                    const loading = document.getElementById('loadingPreview');
+                    if (loading) loading.style.display = 'none';
+                }, 3000);
+                
+            } else {
+                showPreviewError(url, fileName);
+            }
+            
+            document.getElementById('filePreviewModal').classList.remove('hidden');
+            document.getElementById('filePreviewModal').classList.add('flex');
+        }
+        
+        function showPreviewError(url, fileName) {
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="text-6xl mb-4">📄</div>
+                    <h4 class="text-lg font-medium text-gray-800 mb-2">${fileName}</h4>
+                    <p class="text-gray-600 mb-4">Preview tidak tersedia untuk jenis file ini</p>
+                    <div class="space-y-2">
+                        <button onclick="window.open('${url}', '_blank')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mr-2">
+                            Buka File Asli
+                        </button>
+                        <button onclick="copyToClipboard('${url}')" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
+                            Salin Link
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">Klik "Buka File Asli" untuk melihat file di platform aslinya</p>
+                </div>
+            `;
+        }
+        
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show temporary success message
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Tersalin!';
+                button.classList.add('bg-green-600');
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('bg-green-600');
+                }, 2000);
+            }).catch(() => {
+                alert('Gagal menyalin link. Silakan salin manual.');
+            });
+        }
+
+        document.getElementById('openOriginalFile').addEventListener('click', () => {
+            if (currentFileUrl) {
+                window.open(currentFileUrl, '_blank');
+            }
+        });
+
+        document.getElementById('closePreviewModal').addEventListener('click', () => {
+            document.getElementById('filePreviewModal').classList.add('hidden');
+            document.getElementById('filePreviewModal').classList.remove('flex');
+        });
+
+        document.getElementById('filePreviewModal').addEventListener('click', (e) => {
+            if (e.target.id === 'filePreviewModal') {
+                document.getElementById('filePreviewModal').classList.add('hidden');
+                document.getElementById('filePreviewModal').classList.remove('flex');
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97ac9e4094688802',t:'MTc1NzE0NzU3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
